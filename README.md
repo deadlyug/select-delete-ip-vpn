@@ -41,6 +41,25 @@ sudo cp delIpVPN selectIpVPN /usr/local/bin
 sudo ln -s $(pwd)/selectIpVPN $(pwd)/delIpVPN /usr/local/bin/
 ```
 
+### Configure the script
+change google, wikipedia, youtube domain and ip to domain your choose at selectIpVPN and delIpVPN, and also you can add more domain.
+<br>
+add all your domain you have been added to ~/.ssh/config. like this example:
+```
+Host google
+     HostName 8.8.8.8
+     User root
+     port 22
+Host wikipedia
+     HostName <ip-or-domain>
+     User user
+     port 22
+Host yourube
+     HostName <ip-or-domain>
+     User user
+     Port 22
+```
+
 ### Troubleshoot
 
 #### - Cannot find ppp0
