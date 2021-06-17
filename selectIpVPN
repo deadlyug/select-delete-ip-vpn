@@ -1,0 +1,178 @@
+#!/bin/bash
+
+while true
+do
+    echo "";
+    echo "======================================================";
+    echo "== Select Or Delete Single IP to Use VPN Connection ==";
+    echo "";
+    route
+    echo "";
+    echo "======================================================";
+    echo "";
+    PS3='Select or Delete VPN: '
+    options=("Set ip" "Delete ip")
+    select opt in "${options[@]}"
+    do
+        case $opt in
+            "Set ip")
+                echo "";
+                echo "============================================";
+                echo "== Select Single IP to Use VPN Connection ==";
+                echo "";
+                PS3='Please Select VPN: '
+                options=("pptp" "OpenVPN")
+                select opt in "${options[@]}"
+                do
+                    case $opt in
+                        "pptp")
+                            if ! ifconfig | grep ppp0; then
+                              sudo pon myVPN
+                              sudo ip link set ppp0 up
+                            fi
+                            vpn="ppp0"
+                            break
+                            ;;
+                        "OpenVPN")
+                            if ! ifconfig | grep tun0; then
+                              sudo pon myVPN
+                              sudo ip link set tun0 up
+                            fi
+                            vpn="tun0"
+                            break
+                            ;;
+                        *) echo "invalid option $REPLY";;
+                    esac
+                done
+
+                while true
+                do
+                    echo "";
+                    echo "============================================";
+                    echo "";
+                    PS3='Please Select IP: '
+                    options=("back to select or delete" "manual input" "re-select vpn type" "turn off pptp vpn" "google" "wikipedia" "youtube")
+                    select opt in "${options[@]}"
+                    do
+                        case $opt in
+                            "manual input")
+                                read -p 'input ip: ' ipManual
+                                ip=$ipManual
+                                break
+                                ;;
+                            "back to select or delete")
+                                bash /usr/local/bin/selectIpVPN exit
+                                break
+                                ;;
+                            "re-select vpn type")
+                                  echo "";
+                                  echo "============================================";
+                                  echo "== Select Single IP to Use VPN Connection ==";
+                                  echo "";
+                                  PS3='Please Select VPN: '
+                                  options=("pptp" "OpenVPN")
+                                  select opt in "${options[@]}"
+                                  do
+                                      case $opt in
+                                          "pptp")
+                                              vpn2="ppp0"
+                                              break
+                                              ;;
+                                          "OpenVPN")
+                                              vpn2="tun0"
+                                              break
+                                              ;;
+                                          *) echo "invalid option $REPLY";;
+                                      esac
+                                  done
+                                break
+                                ;;
+                            "turn off pptp vpn")
+                                  if sudo poff myVPN ; then
+                                    echo "Success turn off pptp vpn"
+                                    else
+                                    echo "Failed to turn off pptp vpn"
+                                  fi
+                                exit
+                                break
+                                ;;
+                            "google")
+                                ip="8.8.8.8"
+                                host="google"
+                                break
+                                ;;
+                            "wikipedia")
+                                ip="<change-to-domain-ip>"
+                                host="wikipedia"
+                                break
+                                ;;
+                            "youtube")
+                                ip="<change-to-domain-ip>"
+                                host="youtube"
+                                break
+                                ;;
+                            *) echo "invalid option $REPLY";;
+                        esac
+                    done
+
+                    if [[ -v vpn2  ]] ; then
+                      if [[ ! -v ip  ]] ; then
+                      echo "Success change vpn type"
+                      else
+                        if sudo ip route add $ip dev $vpn2 ; then
+                          echo "Success set ip to VPN access";
+                          echo "";
+                          route
+                          echo "";
+                            while true; do
+                              read -p "Do you wish to ssh to $host? (y/n) " yn
+                                case $yn in
+                                    [Yy]* ) ssh $host; break;;
+                                    [Nn]* ) break;;
+                                    * ) echo "Please answer yes or no.";;
+                                esac
+                            done
+                          unset host
+                          unset ip
+                        else
+                          echo "Failed set ip to VPN access";
+                          unset host
+                          unset ip
+                        fi
+                      fi
+                    else
+                        if sudo ip route add $ip dev $vpn ; then
+                          echo "Success set ip to VPN access";
+                          echo "";
+                          route
+                          echo "";
+                            while true; do
+                              read -p "Do you wish to ssh to $host? (y/n) " yn
+                                case $yn in
+                                    [Yy]* ) ssh $host; break;;
+                                    [Nn]* ) break;;
+                                    * ) echo "Please answer yes or no.";;
+                                esac
+                            done
+                          unset host
+                          unset ip
+                        else
+                          echo "Failed set ip to VPN access";
+                          unset host
+                          unset ip
+                        fi
+                    fi
+                  sleep 1
+                done
+                break
+                ;;
+            "Delete ip")
+                bash /usr/local/bin/delIpVPN
+                break
+                ;;
+            *) echo "invalid option $REPLY";;
+        esac
+    done
+
+  sleep 1
+done

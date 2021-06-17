@@ -1,0 +1,62 @@
+#!/bin/bash
+
+route
+
+echo "";
+echo "==========================================";
+echo "== Delete Single IP from VPN Connection ==";
+echo "";
+PS3='Please Select VPN: '
+options=("pptp" "OpenVPN")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "pptp")
+            vpn="ppp0"
+            break
+            ;;
+        "OpenVPN")
+            vpn="tun0"
+            break
+            ;;
+        *) echo "invalid option $REPLY";;
+    esac
+done
+
+echo "";
+echo "==========================================";
+echo "";
+PS3='Please Select IP: '
+options=("input manual" "google" "wikipedia" "youtube")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "input manual")
+            read -p 'input ip: ' ipManual
+            ip=$ipManual
+            break
+            ;;
+	 "google")
+            ip="8.8.8.8"
+	    host="google"
+ 	    break
+	    ;;
+	  "wikipedia")
+	    ip="<change-to-domain-ip>"
+	    host="wikipedia"
+  	    break
+	    ;;
+	  "youtube")
+	    ip="<change-to-domain-ip>"
+	    host="youtube"
+	    break
+	    ;;
+        *) echo "invalid option $REPLY";;
+    esac
+done
+
+if sudo ip route del $ip dev $vpn ; then
+  echo "Success delete ip from VPN access";
+else
+  echo "Failed delete ip from VPN access";
+fi
