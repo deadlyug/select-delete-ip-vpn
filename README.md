@@ -41,8 +41,13 @@ sudo cp delIpVPN selectIpVPN /usr/local/bin
 sudo ln -s $(pwd)/selectIpVPN $(pwd)/delIpVPN /usr/local/bin/
 ```
 
-#### Troubleshoot
-Solution if get errot "cannot load ppp_generic module", edit the /etc/modprobe.d/modules.conf file and change
+### Troubleshoot
+
+#### - Cannot find ppp0
+cek if tunnel works `sudo pon myVPN`, if error, you have troubleshoot the error base in your error you get. 
+
+#### - Solution if get errot "cannot load ppp_generic module"
+edit the /etc/modprobe.d/modules.conf file and change
 ```
 alias char-major-108 ppp
 ```
